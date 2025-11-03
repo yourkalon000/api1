@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Short.io Human Clicks Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary: #6C63FF;
+  --primary-dark: #5A52D3;
+  --secondary: #FF6584;
+  --accent: #36D1DC;
+  --dark: #2D3748;
+  --light: #F7FAFC;
+  --gray: #A0AEC0;
+  --gray-light: #E2E8F0;
+  --success: #48BB78;
+  --warning: #ED8936;
+  --gradient: linear-gradient(135deg, var(--primary), var(--accent));
+  --gradient-secondary: linear-gradient(135deg, var(--secondary), #FF8E53);
+  --border-radius: 12px;
+  --box-shadow: 0 10px 25px rgba(108, 99, 255, 0.15);
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: var(--dark);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard-container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  width: 900px;
+  max-width: 95%;
+}
+
+.header {
+  background: var(--gradient);
+  color: white;
+  padding: 25px 30px;
+  text-align: center;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.header-icon {
+  background: rgba(255, 255, 255, 0.2);
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.header-text h1 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.dashboard-content {
+  padding: 30px;
+}
+
+.control-panel {
+  background: var(--light);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--dark);
+  font-size: 14px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid var(--gray-light);
+  border-radius: 10px;
+  font-size: 15px;
+  transition: var(--transition);
+  background: white;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+}
+
+.flex-row {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.flex-row > * {
+  flex: 1;
+}
+
+.btn-primary {
+  background: var(--gradient);
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 20px rgba(108, 99, 255, 0.4);
+}
+
+.stats-card {
+  background: var(--gradient);
+  color: white;
+  padding: 25px;
+  border-radius: var(--border-radius);
+  text-align: center;
+  margin-bottom: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stats-value {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.stats-label {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.chart-container {
+  background: white;
+  border: 1px solid var(--gray-light);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.chart-title {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: var(--dark);
+  border-bottom: 2px solid var(--light);
+  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+canvas {
+  width: 100% !important;
+}
+
+@media (max-width: 768px) {
+  .flex-row {
+    flex-direction: column;
+  }
+  
+  .dashboard-content {
+    padding: 20px;
+  }
+  
+  .control-panel {
+    padding: 20px;
+  }
+  
+  .header {
+    padding: 20px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="dashboard-container">
+  <div class="header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="header-text">
+        <h1>Short.io Analytics Dashboard</h1>
+      </div>
+    </div>
+  </div>
+  
+  <div class="dashboard-content">
+    <div class="control-panel">
+      <div class="input-group">
+        <label for="linkId"><i class="fas fa-link"></i> Link ID</label>
+        <input type="text" id="linkId" class="input-field" placeholder="Enter Link ID" value="lnk_6sfV_JqPMeBLeyrvLSq0JBUEem">
+      </div>
+      
+      <div class="flex-row">
+        <div class="input-group">
+          <label for="period"><i class="fas fa-calendar"></i> Time Period</label>
+          <select id="period" class="input-field">
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="total" selected>Total</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="startDate"><i class="fas fa-calendar-alt"></i> Start Date</label>
+          <input type="date" id="startDate" class="input-field">
+        </div>
+        
+        <div class="input-group">
+          <label for="endDate"><i class="fas fa-calendar-alt"></i> End Date</label>
+          <input type="date" id="endDate" class="input-field">
+        </div>
+      </div>
+      
+      <button class="btn-primary" onclick="getStats()">
+        <i class="fas fa-chart-bar"></i> Get Stats
+      </button>
+    </div>
+    
+    <div class="stats-card">
+      <div class="stats-label">Human Clicks</div>
+      <div class="stats-value" id="humanClicks">--</div>
+    </div>
+    
+    <div class="chart-container">
+      <h3 class="chart-title">
+        <i class="fas fa-flag"></i> Top Countries (Human Clicks)
+      </h3>
+      <canvas id="countryChart"></canvas>
+    </div>
+    
+    <div class="chart-container">
+      <h3 class="chart-title">
+        <i class="fas fa-chart-line"></i> Date-wise Human Click Trend
+      </h3>
+      <canvas id="lineChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+let countryChart, lineChart;
+
+async function getStats(){
+  const linkId = document.getElementById('linkId').value;
+  const periodSelect = document.getElementById('period').value;
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+
+  if(!linkId){ alert("Enter Link ID"); return; }
+
+  const params = new URLSearchParams({ linkId });
+
+  if(startDate && endDate){
+    params.set('startDate', startDate);
+    params.set('endDate', endDate);
+    params.set('period', 'custom');
+  } else {
+    params.set('period', periodSelect);
+  }
+
+  const res = await fetch(`/api/stats?${params.toString()}`);
+  const data = await res.json();
+
+  // Human Clicks
+  document.getElementById('humanClicks').innerText = data.humanClicks || 0;
+
+  // Top Countries Line Chart
+  const countries = data.country || [];
+  const countryLabels = countries.map(c=>c.countryName);
+  const countryValues = countries.map(c=>c.score);
+
+  if(countryChart) countryChart.destroy();
+  const ctx1 = document.getElementById('countryChart').getContext('2d');
+  countryChart = new Chart(ctx1,{
+    type:'line',
+    data:{ labels:countryLabels, datasets:[{ label:'Human Clicks by Country', data:countryValues, borderColor:'rgba(0,123,255,0.8)', backgroundColor:'rgba(0,123,255,0.3)', fill:true }] },
+    options:{ responsive:true, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  // Date-wise Human Click Trend Line Chart
+  const clickStats = data.clickStatistics?.datasets?.[0]?.data || [];
+  const lineLabels = clickStats.map(item => item.label || item.date || "");
+  const lineValues = clickStats.map(item => item.value || 0);
+
+  if(lineChart) lineChart.destroy();
+  const ctx2 = document.getElementById('lineChart').getContext('2d');
+  lineChart = new Chart(ctx2,{
+    type:'line',
+    data:{ labels:lineLabels, datasets:[{ label:'Human Clicks', data:lineValues, borderColor:'rgba(255,99,132,0.8)', backgroundColor:'rgba(255,99,132,0.3)', fill:true }] },
+    options:{ responsive:true, scales:{ y:{ beginAtZero:true } } }
+  });
+}
+</script>
+</body>
+</html>
